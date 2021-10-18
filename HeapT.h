@@ -1,8 +1,8 @@
 #ifndef HEAPT_H
 #define HEAPT_H
 
-#include <vector>
 #include <cassert>
+#include <vector>
 
 template<class T>
 class Heap {

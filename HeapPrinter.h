@@ -5,12 +5,14 @@
 
 class HeapPrinter {
   using CHeap = Heap<int64_t>;
+
 public:
   struct Spaces {
     int64_t padding;
     int64_t space;
   };
-    void print(const CHeap& heap);
+  void print(const CHeap& heap);
+
 private:
   static int numberOfDigits(int64_t value);
   void printWint(int64_t value);

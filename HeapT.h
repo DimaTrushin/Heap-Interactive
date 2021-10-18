@@ -1,6 +1,9 @@
 #ifndef HEAPT_H
 #define HEAPT_H
 
+// This is required to avoid issuse of using notify in sieve up or down.
+#define NDEBUG
+
 #include "Library/Observer/Observer.h"
 
 #include <cassert>
@@ -9,6 +12,8 @@
 template<class T>
 class Heap {
   using Container = std::vector<T>;
+  // Need to reimplement this. Heap is in incorrect state, when you
+  // sieve up or down. So I cannot notify at those points.
   using ObservableHeap = NSLibrary::CObservable<Heap>;
   using ObserverHeap = NSLibrary::CObserver<Heap>;
 
@@ -27,6 +32,7 @@ public:
   }
 
   Index add(const T& value) {
+    Model_.notify();
     data_.push_back(value);
     Index vertex = sieveUp(data_.size() - 1);
     assert(isStateCorrect());
@@ -36,6 +42,7 @@ public:
 
   Index remove(Index vertex) {
     assert(isCorrectIndex(vertex));
+    Model_.notify();
     if (size() == 1) {
       assert(vertex == 0);
       data_.clear();
@@ -169,6 +176,10 @@ private:
 
   Index sieveUp(Index vertex) {
     if (!doesParentConditionHold(vertex)) {
+      // Currently this is a problem
+      // because the Heap here is in incorrect state.
+      // Thus assert will be triggered.
+      Model_.notify();
       std::swap(data(vertex), parent(vertex));
       return sieveUp(parentIndex(vertex));
     }
@@ -179,6 +190,10 @@ private:
     if (Max == -1)
       return vertex;
     if (data(vertex) < data(Max)) {
+      // Currently this is a problem
+      // because the Heap here is in incorrect state.
+      // Thus assert will be triggered.
+      Model_.notify();
       std::swap(data(vertex), data(Max));
       return sieveDown(Max);
     }

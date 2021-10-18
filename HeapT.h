@@ -1,12 +1,16 @@
 #ifndef HEAPT_H
 #define HEAPT_H
 
+#include "Library/Observer/Observer.h"
+
 #include <cassert>
 #include <vector>
 
 template<class T>
 class Heap {
   using Container = std::vector<T>;
+  using ObservableHeap = NSLibrary::CObservable<Heap>;
+  using ObserverHeap = NSLibrary::CObserver<Heap>;
 
 public:
   using Index = int64_t;
@@ -26,6 +30,7 @@ public:
     data_.push_back(value);
     Index vertex = sieveUp(data_.size() - 1);
     assert(isStateCorrect());
+    Model_.notify();
     return vertex;
   }
 
@@ -35,10 +40,12 @@ public:
       assert(vertex == 0);
       data_.clear();
       assert(isStateCorrect());
+      Model_.notify();
       return -1;
     }
     if (static_cast<size_t>(vertex) == data_.size() - 1) {
       data_.resize(data_.size() - 1);
+      Model_.notify();
       return -1;
     }
     data(vertex) = std::move(data_.back());
@@ -46,6 +53,7 @@ public:
     vertex = sieveUp(vertex);
     vertex = sieveDown(vertex);
     assert(isStateCorrect());
+    Model_.notify();
     return vertex;
   }
 
@@ -73,6 +81,11 @@ public:
 
   int64_t height() const {
     return std::log2(size()) + 1;
+  }
+
+  void subscribe(ObserverHeap* observer) {
+    assert(observer);
+    Model_.subscribe(observer);
   }
 
 private:
@@ -189,6 +202,7 @@ private:
     return true;
   }
 
+  ObservableHeap Model_ = [this]() -> const Heap& { return *this; };
   Container data_;
 };
 

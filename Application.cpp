@@ -1,6 +1,10 @@
 #include "Application.h"
 #include <iostream>
 
+Application::Application() {
+  Data_.subscribe(Printer.view());
+}
+
 void Application::run() {
 
   int msg;
@@ -29,7 +33,7 @@ void Application::handle_game_message(const int msg) {
   default:
     break;
   }
-  Printer.print(Data_);
+  //  Printer.print(Data_);
 }
 
 void Application::handle_adding() {

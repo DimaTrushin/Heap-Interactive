@@ -107,3 +107,8 @@ std::vector<HeapPrinter::Spaces> HeapPrinter::getSpaces(const CHeap& heap) {
   }
   return SpaceData;
 }
+
+void HeapPrinter::printThroughView() {
+  if (View_.hasValue())
+    print(*View_.data());
+}

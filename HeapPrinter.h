@@ -2,9 +2,12 @@
 #define HEAPPRINTER_H
 
 #include "HeapT.h"
+#include "Library/Observer/Observer.h"
 
 class HeapPrinter {
   using CHeap = Heap<int64_t>;
+  using InputHeap = NSLibrary::CHotInput<CHeap>;
+  using ObserverHeap = NSLibrary::CObserver<CHeap>;
 
 public:
   struct Spaces {
@@ -12,6 +15,10 @@ public:
     int64_t space;
   };
   void print(const CHeap& heap);
+
+  ObserverHeap* view() {
+    return &View_;
+  }
 
 private:
   static int numberOfDigits(int64_t value);
@@ -23,6 +30,9 @@ private:
   void printLines(int64_t padding, int64_t space, int64_t layerSize);
   std::vector<Spaces> getSpaces(const CHeap& heap);
 
+  void printThroughView();
+
+  InputHeap View_ = [this](const CHeap& heap) { printThroughView(); };
   std::vector<Spaces> SpaceData_;
   int64_t Word_ = 3;
 };

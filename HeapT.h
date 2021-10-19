@@ -5,6 +5,7 @@
 
 #include <cassert>
 #include <functional>
+#include <map>
 #include <vector>
 
 template<class T>
@@ -14,6 +15,16 @@ class Heap {
 public:
   struct DrawData {
     std::reference_wrapper<const Container> data;
+    enum class Status {
+      Regular,
+      Deleted,
+      MainMoved,
+      SecondaryMoved,
+      Plug,
+      New,
+    };
+    using Format = std::map<int64_t, Status>;
+    Format format;
   };
 
 private:
@@ -35,35 +46,45 @@ public:
   }
 
   Index add(const T& value) {
-    Model_.notify();
+    Model_.set(DrawData{std::cref(data_)});
     data_.push_back(value);
+    Model_.set(DrawData{std::cref(data_),
+                        {{data_.size() - 1, DrawData::Status::New}}});
     Index vertex = sieveUp(data_.size() - 1);
     assert(isStateCorrect());
-    Model_.notify();
+    Model_.set(DrawData{std::cref(data_)});
     return vertex;
   }
 
   Index remove(Index vertex) {
     assert(isCorrectIndex(vertex));
-    Model_.notify();
+    Model_.set(DrawData{std::cref(data_)});
     if (size() == 1) {
       assert(vertex == 0);
+      Model_.set(DrawData{std::cref(data_), {{0, DrawData::Status::Deleted}}});
       data_.clear();
       assert(isStateCorrect());
-      Model_.notify();
+      Model_.set(DrawData{std::cref(data_)});
       return -1;
     }
     if (static_cast<size_t>(vertex) == data_.size() - 1) {
+      Model_.set(DrawData{std::cref(data_),
+                          {{data_.size() - 1, DrawData::Status::Deleted}}});
       data_.resize(data_.size() - 1);
-      Model_.notify();
+      Model_.set(DrawData{std::cref(data_)});
       return -1;
     }
+    Model_.set(
+        DrawData{std::cref(data_), {{vertex, DrawData::Status::Deleted}}});
     data(vertex) = std::move(data_.back());
+    Model_.set(DrawData{std::cref(data_),
+                        {{vertex, DrawData::Status::Plug},
+                         {data_.size() - 1, DrawData::Status::Deleted}}});
     data_.resize(data_.size() - 1);
     vertex = sieveUp(vertex);
     vertex = sieveDown(vertex);
     assert(isStateCorrect());
-    Model_.notify();
+    Model_.set(DrawData{std::cref(data_)});
     return vertex;
   }
 
@@ -176,8 +197,11 @@ private:
 
   Index sieveUp(Index vertex) {
     if (!doesParentConditionHold(vertex)) {
-      Model_.notify();
       std::swap(data(vertex), parent(vertex));
+      Model_.set(
+          DrawData{std::cref(data_),
+                   {{vertex, DrawData::Status::SecondaryMoved},
+                    {parentIndex(vertex), DrawData::Status::MainMoved}}});
       return sieveUp(parentIndex(vertex));
     }
     return vertex;
@@ -187,8 +211,10 @@ private:
     if (Max == -1)
       return vertex;
     if (data(vertex) < data(Max)) {
-      Model_.notify();
       std::swap(data(vertex), data(Max));
+      Model_.set(DrawData{std::cref(data_),
+                          {{vertex, DrawData::Status::SecondaryMoved},
+                           {Max, DrawData::Status::MainMoved}}});
       return sieveDown(Max);
     }
     return vertex;

@@ -26,7 +26,7 @@ private:
   static int numberOfDigits(int64_t value);
   void printWint(int64_t value);
   int64_t layerwidthw(int64_t layer);
-  void printPaddings(const std::vector<Spaces>& data);
+  //  void printPaddings(const std::vector<Spaces>& data);
   void printLines(int64_t padding, int64_t space, int64_t layerSize);
 
   int64_t printLayer(const Container& data, int64_t LayerSize, int64_t Position,

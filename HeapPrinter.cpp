@@ -28,15 +28,6 @@ int64_t HeapPrinter::layerwidthw(int64_t layer) {
   return std::pow(2, layer) * (Word_ + 1) - 1;
 }
 
-void HeapPrinter::printPaddings(const std::vector<Spaces>& data) {
-  if (data.empty())
-    return;
-  for (size_t index = 0; index < data.size() - 1; ++index)
-    std::cout << '{' << data[index].padding << ' ' << data[index].space << "} ";
-  std::cout << '{' << data[data.size() - 1].padding << ' '
-            << data[data.size() - 1].space << "}\n";
-}
-
 void HeapPrinter::printLines(int64_t padding, int64_t space,
                              int64_t layerSize) {
   std::cout << std::string(padding + Word_ / 2, ' ');

@@ -33,7 +33,6 @@ void Application::handle_game_message(const int msg) {
   default:
     break;
   }
-  //  Printer.print(Data_);
 }
 
 void Application::handle_adding() {

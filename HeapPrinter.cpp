@@ -4,29 +4,6 @@
 #include <iostream>
 #include <vector>
 
-void HeapPrinter::print(const CHeap& heap) {
-  if (heap.isEmpty())
-    return;
-  SpaceData_ = getSpaces(heap);
-
-  int64_t LayerSize = 1;
-  int64_t Position = 0;
-  int64_t layer = 0;
-  Position =
-      printHeapLayerNice(heap, LayerSize, Position, SpaceData_[layer].padding,
-                         SpaceData_[layer].space);
-  LayerSize *= 2;
-  ++layer;
-  while (static_cast<size_t>(Position) < heap.size()) {
-    printLines(SpaceData_[layer].padding, SpaceData_[layer].space, LayerSize);
-    Position =
-        printHeapLayerNice(heap, LayerSize, Position, SpaceData_[layer].padding,
-                           SpaceData_[layer].space);
-    LayerSize *= 2;
-    ++layer;
-  }
-}
-
 int HeapPrinter::numberOfDigits(int64_t value) {
   if (value == 0)
     return 1;
@@ -51,28 +28,13 @@ int64_t HeapPrinter::layerwidthw(int64_t layer) {
   return std::pow(2, layer) * (Word_ + 1) - 1;
 }
 
-void HeapPrinter::printPaddings(const std::vector<Spaces>& Container) {
-  if (Container.empty())
+void HeapPrinter::printPaddings(const std::vector<Spaces>& data) {
+  if (data.empty())
     return;
-  for (size_t index = 0; index < Container.size() - 1; ++index)
-    std::cout << '{' << Container[index].padding << ' '
-              << Container[index].space << "} ";
-  std::cout << '{' << Container[Container.size() - 1].padding << ' '
-            << Container[Container.size() - 1].space << "}\n";
-}
-
-int64_t HeapPrinter::printHeapLayerNice(const CHeap& heap, int64_t LayerSize,
-                                        int64_t Position, int64_t padding,
-                                        int64_t space) {
-  std::cout << std::string(padding, ' ');
-  int64_t End = Position + std::min<int64_t>(heap.size() - Position, LayerSize);
-  for (int64_t index = Position; index < End - 1; ++index) {
-    printWint(heap[index]);
-    std::cout << std::string(space, ' ');
-  }
-  printWint(heap[End - 1]);
-  std::cout << std::string(padding, ' ') << '\n';
-  return End;
+  for (size_t index = 0; index < data.size() - 1; ++index)
+    std::cout << '{' << data[index].padding << ' ' << data[index].space << "} ";
+  std::cout << '{' << data[data.size() - 1].padding << ' '
+            << data[data.size() - 1].space << "}\n";
 }
 
 void HeapPrinter::printLines(int64_t padding, int64_t space,
@@ -90,8 +52,8 @@ void HeapPrinter::printLines(int64_t padding, int64_t space,
   std::cout << '\n';
 }
 
-std::vector<HeapPrinter::Spaces> HeapPrinter::getSpaces(const CHeap& heap) {
-  int64_t height = heap.height();
+std::vector<HeapPrinter::Spaces> HeapPrinter::getSpaces(const Container& data) {
+  int64_t height = std::log2(data.size()) + 1;
   int64_t Width = layerwidthw(height - 1);
 
   std::vector<Spaces> SpaceData(height);
@@ -108,7 +70,40 @@ std::vector<HeapPrinter::Spaces> HeapPrinter::getSpaces(const CHeap& heap) {
   return SpaceData;
 }
 
-void HeapPrinter::printThroughView() {
-  if (View_.hasValue())
-    print(*View_.data());
+int64_t HeapPrinter::printLayer(const Container& data, int64_t LayerSize,
+                                int64_t Position, int64_t padding,
+                                int64_t space) {
+  std::cout << std::string(padding, ' ');
+  int64_t End = Position + std::min<int64_t>(data.size() - Position, LayerSize);
+  for (int64_t index = Position; index < End - 1; ++index) {
+    printWint(data[index]);
+    std::cout << std::string(space, ' ');
+  }
+  printWint(data[End - 1]);
+  std::cout << std::string(padding, ' ') << '\n';
+  return End;
+}
+
+void HeapPrinter::drawData(const DrawData& DrawData) {
+  const Container& data = DrawData.data;
+  if (data.empty()) {
+    std::cout << "Empty\n";
+    return;
+  }
+  SpaceData_ = getSpaces(data);
+
+  int64_t LayerSize = 1;
+  int64_t Position = 0;
+  int64_t layer = 0;
+  Position = printLayer(data, LayerSize, Position, SpaceData_[layer].padding,
+                        SpaceData_[layer].space);
+  LayerSize *= 2;
+  ++layer;
+  while (static_cast<size_t>(Position) < data.size()) {
+    printLines(SpaceData_[layer].padding, SpaceData_[layer].space, LayerSize);
+    Position = printLayer(data, LayerSize, Position, SpaceData_[layer].padding,
+                          SpaceData_[layer].space);
+    LayerSize *= 2;
+    ++layer;
+  }
 }

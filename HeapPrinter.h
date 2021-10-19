@@ -6,33 +6,37 @@
 
 class HeapPrinter {
   using CHeap = Heap<int64_t>;
-  using InputHeap = NSLibrary::CHotInput<CHeap>;
-  using ObserverHeap = NSLibrary::CObserver<CHeap>;
+  using Container = std::vector<int64_t>;
+
+  using DrawData = CHeap::DrawData;
+  using InputDrawData = NSLibrary::CHotInput<DrawData>;
+  using ObserverDrawData = NSLibrary::CObserver<DrawData>;
 
 public:
   struct Spaces {
     int64_t padding;
     int64_t space;
   };
-  void print(const CHeap& heap);
 
-  ObserverHeap* view() {
-    return &View_;
+  ObserverDrawData* view() {
+    return &DrawDataView_;
   }
 
 private:
   static int numberOfDigits(int64_t value);
   void printWint(int64_t value);
   int64_t layerwidthw(int64_t layer);
-  void printPaddings(const std::vector<Spaces>& Container);
-  int64_t printHeapLayerNice(const CHeap& heap, int64_t LayerSize,
-                             int64_t Position, int64_t padding, int64_t space);
+  void printPaddings(const std::vector<Spaces>& data);
   void printLines(int64_t padding, int64_t space, int64_t layerSize);
-  std::vector<Spaces> getSpaces(const CHeap& heap);
 
-  void printThroughView();
+  int64_t printLayer(const Container& data, int64_t LayerSize, int64_t Position,
+                     int64_t padding, int64_t space);
+  std::vector<Spaces> getSpaces(const Container& heap);
+  void drawData(const DrawData& DrawData);
 
-  InputHeap View_ = [this](const CHeap& heap) { printThroughView(); };
+  InputDrawData DrawDataView_ = [this](const DrawData& data) {
+    drawData(data);
+  };
   std::vector<Spaces> SpaceData_;
   int64_t Word_ = 3;
 };

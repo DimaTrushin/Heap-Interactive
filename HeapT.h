@@ -1,21 +1,24 @@
 #ifndef HEAPT_H
 #define HEAPT_H
 
-// This is required to avoid issuse of using notify in sieve up or down.
-#define NDEBUG
-
 #include "Library/Observer/Observer.h"
 
 #include <cassert>
+#include <functional>
 #include <vector>
 
 template<class T>
 class Heap {
   using Container = std::vector<T>;
-  // Need to reimplement this. Heap is in incorrect state, when you
-  // sieve up or down. So I cannot notify at those points.
-  using ObservableHeap = NSLibrary::CObservable<Heap>;
-  using ObserverHeap = NSLibrary::CObserver<Heap>;
+
+public:
+  struct DrawData {
+    std::reference_wrapper<const Container> data;
+  };
+
+private:
+  using ObservableDrawData = NSLibrary::CObservableData<DrawData>;
+  using ObserverDrawData = NSLibrary::CObserver<DrawData>;
 
 public:
   using Index = int64_t;
@@ -90,7 +93,7 @@ public:
     return std::log2(size()) + 1;
   }
 
-  void subscribe(ObserverHeap* observer) {
+  void subscribe(ObserverDrawData* observer) {
     assert(observer);
     Model_.subscribe(observer);
   }
@@ -116,9 +119,6 @@ private:
       return kUndefinedIndex;
     return (vertex - 1) / 2;
   }
-  //  static bool isRoot(Index vertex) {
-  //    return vertex == 0;
-  //  }
 
   bool hasParent(Index vertex) const {
     return vertex > 0;
@@ -176,9 +176,6 @@ private:
 
   Index sieveUp(Index vertex) {
     if (!doesParentConditionHold(vertex)) {
-      // Currently this is a problem
-      // because the Heap here is in incorrect state.
-      // Thus assert will be triggered.
       Model_.notify();
       std::swap(data(vertex), parent(vertex));
       return sieveUp(parentIndex(vertex));
@@ -190,9 +187,6 @@ private:
     if (Max == -1)
       return vertex;
     if (data(vertex) < data(Max)) {
-      // Currently this is a problem
-      // because the Heap here is in incorrect state.
-      // Thus assert will be triggered.
       Model_.notify();
       std::swap(data(vertex), data(Max));
       return sieveDown(Max);
@@ -217,8 +211,8 @@ private:
     return true;
   }
 
-  ObservableHeap Model_ = [this]() -> const Heap& { return *this; };
   Container data_;
+  ObservableDrawData Model_ = DrawData{std::cref(data_)};
 };
 
 #endif // HEAPT_H

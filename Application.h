@@ -28,7 +28,7 @@ private:
       "The heap is empty, you cannot delete an element\n";
 
   Heap<int64_t> Data_;
-  HeapPrinter Printer;
+  HeapPrinter Printer_;
   int64_t Word_ = 3;
 };
 

@@ -34,6 +34,7 @@ public:
   void setGreenOnBlack();
   void setBlueOnBlack();
   void setDefault();
+  void clear();
 
 private:
   HANDLE hConsole_;

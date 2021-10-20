@@ -1,7 +1,9 @@
 #include "HeapPrinter.h"
 
 #include <algorithm>
+#include <chrono>
 #include <iostream>
+#include <thread>
 #include <vector>
 
 HeapPrinter::HeapPrinter(int64_t numberSize)
@@ -96,6 +98,9 @@ int64_t HeapPrinter::printLayer(const DrawData& DrawData, int64_t LayerSize,
 }
 
 void HeapPrinter::drawData(const DrawData& DrawData) {
+  using namespace std::chrono_literals;
+  std::this_thread::sleep_for(1000ms);
+  Brush_.clear();
   const Container& data = DrawData.data;
   if (data.empty()) {
     std::cout << "Empty\n";

@@ -42,7 +42,7 @@ private:
   };
   std::vector<Spaces> SpaceData_;
   Colorizor Brush_;
-  int64_t Word_ = 3;
+  int64_t Word_ = 11;
 };
 
 #endif // HEAPPRINTER_H

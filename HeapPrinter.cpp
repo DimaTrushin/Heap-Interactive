@@ -4,6 +4,10 @@
 #include <iostream>
 #include <vector>
 
+HeapPrinter::HeapPrinter(int64_t numberSize)
+    : Word_(normalizeWord(numberSize)) {
+}
+
 int HeapPrinter::numberOfDigits(int64_t value) {
   if (value == 0)
     return 1;
@@ -98,4 +102,12 @@ void HeapPrinter::drawData(const DrawData& DrawData) {
     LayerSize *= 2;
     ++layer;
   }
+}
+
+int64_t HeapPrinter::normalizeWord(int64_t word) {
+  if (word < 3)
+    return 3;
+  if (word % 2 == 0)
+    ++word;
+  return word;
 }

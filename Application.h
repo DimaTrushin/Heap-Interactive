@@ -29,7 +29,6 @@ private:
 
   Heap<int64_t> Data_;
   HeapPrinter Printer_;
-  int64_t Word_ = 11;
 };
 
 #endif // APPLICATION_H

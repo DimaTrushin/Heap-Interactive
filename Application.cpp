@@ -2,7 +2,7 @@
 #include <iostream>
 
 Application::Application() {
-  Data_.subscribe(Printer.view());
+  Data_.subscribe(Printer_.view());
 }
 
 void Application::run() {

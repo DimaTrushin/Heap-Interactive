@@ -13,6 +13,7 @@ int HeapPrinter::numberOfDigits(int64_t value) {
 }
 
 void HeapPrinter::printWint(int64_t value) {
+
   int64_t digits = numberOfDigits(value);
   int64_t spaces = Word_ - digits;
   if (spaces < 0) {
@@ -52,8 +53,8 @@ std::vector<HeapPrinter::Spaces> HeapPrinter::getSpaces(const Container& data) {
   SpaceData[k] = {0, 1};
   --k;
   for (; k >= 0; --k) {
-    SpaceData[k].padding =
-        SpaceData[k + 1].padding + Word_ + SpaceData[k + 1].space / 2 - 1;
+    SpaceData[k].padding = SpaceData[k + 1].padding + Word_ +
+                           SpaceData[k + 1].space / 2 - Word_ / 2;
     SpaceData[k].space = std::max(
         0., (Width - std::pow(2, k) * Word_ - 2 * SpaceData[k].padding) /
                 (std::pow(2, k) - 1));

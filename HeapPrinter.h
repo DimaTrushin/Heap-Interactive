@@ -15,6 +15,9 @@ class HeapPrinter {
   using ObserverDrawData = NSLibrary::CObserver<DrawData>;
 
 public:
+  HeapPrinter() = default;
+  explicit HeapPrinter(int64_t numberSize);
+
   struct Spaces {
     int64_t padding;
     int64_t space;
@@ -40,9 +43,12 @@ private:
   InputDrawData DrawDataView_ = [this](const DrawData& data) {
     drawData(data);
   };
+
+  static int64_t HeapPrinter::normalizeWord(int64_t word);
+
   std::vector<Spaces> SpaceData_;
   Colorizor Brush_;
-  int64_t Word_ = 11;
+  int64_t Word_ = 3;
 };
 
 #endif // HEAPPRINTER_H
